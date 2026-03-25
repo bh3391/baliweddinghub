@@ -1,0 +1,56 @@
+{
+  "user": [
+    {
+      "name": "Ringkasan",
+      "href": "/dashboard/user",
+      "icon": "LayoutDashboard"
+    },
+    {
+      "name": "Wedding Planner",
+      "href": "/dashboard/user/plans",
+      "icon": "Heart"
+    },
+    {
+      "name": "Rencana Saya",
+      "href": "/dashboard/user/my-plans",
+      "icon": "Todo2"
+    },
+
+    {
+      "name": "Kalkulator Budget",
+      "href": "/dashboard/user/budget",
+      "icon": "Calculator"
+    },
+    { "name": "Profil Saya", "href": "/dashboard/user/profile", "icon": "User" }
+  ],
+  "vendor": [
+    {
+      "name": "Statistik",
+      "href": "/dashboard/vendor",
+      "icon": "LayoutDashboard"
+    },
+    {
+      "name": "Inquiry Masuk",
+      "href": "/dashboard/vendor/inquiries",
+      "icon": "ClipboardList"
+    },
+    {
+      "name": "Kelola Layanan",
+      "href": "/dashboard/vendor/profile",
+      "icon": "Store"
+    },
+    {
+      "name": "Pengaturan Akun",
+      "href": "/dashboard/vendor/settings",
+      "icon": "Settings"
+    }
+  ],
+  "admin": [
+    { "name": "Master Data", "href": "/dashboard/admin", "icon": "Settings" },
+    {
+      "name": "Verify Vendors",
+      "href": "/dashboard/admin/verify",
+      "icon": "ClipboardList"
+    }
+  ]
+}
