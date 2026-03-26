@@ -30,18 +30,30 @@ export default function MyPlansClient({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
   const [showDonation, setShowDonation] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
   const [serviceType, setServiceType] = useState<"self_service" | "managed_wo">(
     "self_service"
   );
 
-  const handleProcess = async (planId: string) => {
+  const handleProcess = (
+    id: string,
+    type: "self_service" | "managed_wo",
+    amount: number
+  ) => {
     startTransition(async () => {
-      const result = await processInquiry(planId, serviceType);
-      if (result.success) {
-        setSelectedPlan(null); // Tutup modal rincian
-        ; // Buka modal donasi
-      } else {
-        toast.error(result.message);
+      try {
+        const res = await processInquiry(id, type, amount);
+
+        if (res.success) {
+          toast.success(res.message);
+          setShowModal(false);
+          setSelectedPlan(null); // Reset selection
+        } else {
+          toast.error(res.message || "Gagal memproses rencana.");
+        }
+      } catch (error) {
+        toast.error("Terjadi kesalahan sistem.");
       }
     });
   };

@@ -128,19 +128,30 @@ export async function deletePlan(planId: string) {
     return { success: false, message: error.message };
   }
 }
+
+// src/actions/plan-actions.ts
+
 export async function processInquiry(
   planId: string,
-  serviceType: "self_service" | "managed_wo"
+  serviceType: "self_service" | "managed_wo",
+  finalAmount: number
 ) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) throw new Error("Silakan login terlebih dahulu");
 
+    const targetStatus =
+      serviceType === "self_service" ? "pending_payment" : "managed_by_wo";
+
     const updated = await db
       .update(inquiries)
       .set({
-        status: "on-process",
-        serviceType: serviceType, // Menyimpan pilihan 'Karya Mandiri' atau 'Karya Pandu'
+        status: targetStatus,
+        serviceType: serviceType,
+        // Sekarang nominal transfer masuk ke kolom khusus platformFee
+        platformFee: finalAmount.toString(),
+        paymentStatus: "unpaid",
+        // totalEstimate TIDAK disentuh, jadi budget vendor tetap aman
       })
       .where(
         and(eq(inquiries.id, planId), eq(inquiries.userId, session.user.id))
@@ -150,12 +161,14 @@ export async function processInquiry(
     if (updated.length === 0) throw new Error("Rencana tidak ditemukan.");
 
     revalidatePath("/dashboard/user/my-plans");
+    revalidatePath("/dashboard/user/inquiry");
+
     return {
       success: true,
       message:
         serviceType === "managed_wo"
-          ? "Inquiry dikirim! Tim WO kami akan segera menghubungi Anda."
-          : "Inquiry berhasil! Silakan hubungi vendor secara mandiri.",
+          ? "Inquiry terkirim! Tim WO kami akan segera menghubungi Anda."
+          : "Instruksi pembayaran dibuat. Silakan transfer tepat sesuai nominal.",
     };
   } catch (error: any) {
     return { success: false, message: error.message };

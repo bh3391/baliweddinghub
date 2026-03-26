@@ -95,7 +95,8 @@ export default function PlansClient({
   const [ceremonyDate, setCeremonyDate] = useState("");
   const [isPending, startTransition] = useTransition();
   const [viewingVendor, setViewingVendor] = useState<any | null>(null);
-
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const router = useRouter();
 
   // State untuk Slider Mobile
@@ -110,14 +111,19 @@ export default function PlansClient({
     [initialVendors]
   );
 
-  const filteredVendors = useMemo(
-    () => vendors.filter((v) => v.category.toLowerCase() === activeTab),
-    [vendors, activeTab]
-  );
+  const filteredVendors = useMemo(() => {
+    return vendors.filter((v) => {
+      const matchCategory = v.category.toLowerCase() === activeTab;
+      const matchLocation = selectedLocation
+        ? v.location?.toLowerCase() === selectedLocation.toLowerCase()
+        : true;
+      return matchCategory && matchLocation;
+    });
+  }, [vendors, activeTab, selectedLocation]);
 
   useEffect(() => {
     setActiveVendorIndex(0);
-  }, [activeTab]);
+  }, [activeTab, selectedLocation]);
 
   const completedSteps = Object.keys(selectedItems).filter(
     (key) => selectedItems[key].length > 0
@@ -348,6 +354,22 @@ export default function PlansClient({
             </div>
           </div>
         </div>
+        <div className="no-scrollbar mb-6 flex gap-2 overflow-x-auto pb-2">
+          {["Semua", "Singaraja", "Lovina", "Munduk", "Ubud"].map((loc) => (
+            <button
+              key={loc}
+              onClick={() => setSelectedLocation(loc === "Semua" ? null : loc)}
+              className={`flex-shrink-0 rounded-full px-5 py-2 text-[10px] font-bold tracking-widest uppercase transition-all ${
+                (loc === "Semua" && !selectedLocation) ||
+                selectedLocation === loc
+                  ? "bg-amber-900 text-white shadow-md"
+                  : "bg-stone-100 text-stone-500 hover:bg-stone-200"
+              }`}
+            >
+              {loc}
+            </button>
+          ))}
+        </div>
 
         {/* MOBILE VENDOR SLIDER */}
         <div className="relative lg:hidden">
@@ -490,7 +512,7 @@ export default function PlansClient({
         </div>
 
         {/* DESKTOP VENDOR GRID */}
-        <div className="hidden grid-cols-2 gap-8 lg:grid">
+        <div className="hidden gap-8 lg:grid lg:grid-cols-2">
           {filteredVendors.map((vendor) => {
             const vendorSelectedPackages =
               selectedItems[vendor.category]?.filter(
@@ -570,37 +592,126 @@ export default function PlansClient({
         </div>
       </div>
 
-      {/* Floating Save Button */}
-      {completedSteps > 0 && (
-        <div className="fixed bottom-10 left-1/2 z-[150] -translate-x-1/2">
-          <button
-            onClick={handleSave}
-            disabled={isPending}
-            className="flex items-center gap-4 rounded-full border-4 border-white bg-stone-900 px-10 py-5 text-white shadow-2xl transition-all hover:bg-amber-900 active:scale-95"
-          >
-            {isPending ? (
-              <Loader2 className="h-5 w-5 animate-spin text-amber-400" />
-            ) : (
-              <Calculator className="h-5 w-5 text-amber-400" />
-            )}
-            <div className="text-left">
-              <span className="block text-sm font-semibold">
-                Simpan Rencana ({completedSteps})
-              </span>
-              <span className="block text-[10px] leading-none font-bold tracking-tighter text-amber-300 uppercase">
-                Total: Rp {totalEstimate.toLocaleString("id-ID")}
-              </span>
-            </div>
-          </button>
-        </div>
-      )}
-
       <VendorModal
         vendor={viewingVendor}
         selectedItems={selectedItems}
         onClose={() => setViewingVendor(null)}
         onTogglePackage={handleTogglePackage}
       />
+      <AnimatePresence>
+        {completedSteps > 0 && (
+          <>
+            {/* Floating Circle Button */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              className="fixed right-6 bottom-20 z-[160]"
+            >
+              <button
+                onClick={() => setIsDrawerOpen(true)}
+                className="relative flex h-16 w-16 items-center justify-center rounded-full bg-stone-900 text-white shadow-2xl transition-all hover:bg-amber-900 active:scale-90"
+              >
+                <ShoppingBag size={24} className="text-amber-400" />
+
+                {/* Badge Jumlah Pilihan */}
+                <div className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-red-500 text-[10px] font-bold">
+                  {completedSteps}
+                </div>
+              </button>
+            </motion.div>
+
+            {/* DRAWER OVERLAY */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsDrawerOpen(true)}
+              className={`fixed inset-0 z-[200] ${isDrawerOpen ? "pointer-events-auto bg-stone-900/40 backdrop-blur-sm" : "pointer-events-none opacity-0"}`}
+            />
+
+            {/* DRAWER CONTENT */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: isDrawerOpen ? 0 : "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed inset-x-0 bottom-0 z-[210] mx-auto max-h-[90vh] max-w-4xl overflow-y-auto rounded-t-[2.5rem] bg-white p-8 shadow-[0_-20px_50px_rgba(0,0,0,0.1)]"
+            >
+              {/* Handle Bar */}
+              <div className="mx-auto mb-6 h-1.5 w-12 rounded-full bg-stone-200" />
+
+              <div className="mb-8 flex items-center justify-between">
+                <h2 className="font-serif text-2xl text-stone-900">
+                  Rincian Rencana
+                </h2>
+                <button
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="text-stone-400 hover:text-stone-900"
+                >
+                  Tutup
+                </button>
+              </div>
+
+              {/* List Vendor yang Dipilih */}
+              <div className="space-y-4">
+                {Object.values(selectedItems)
+                  .flat()
+                  .map((item) => (
+                    <div
+                      key={item.packageId}
+                      className="flex items-center justify-between rounded-2xl bg-stone-50 p-4"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-amber-700">
+                          <CheckCircle2 size={18} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold tracking-tighter text-stone-400 uppercase">
+                            {item.category}
+                          </p>
+                          <p className="font-bold text-stone-900">
+                            {item.businessName}
+                          </p>
+                          <p className="text-[10px] text-stone-500 uppercase">
+                            Paket {item.tier}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="font-mono text-sm font-bold text-amber-900">
+                        Rp {Number(item.price).toLocaleString("id-ID")}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+
+              {/* Total & Action */}
+              <div className="mt-8 border-t border-stone-100 pt-6">
+                <div className="mb-6 flex items-center justify-between">
+                  <span className="text-stone-500">Total Estimasi</span>
+                  <span className="font-serif text-2xl font-bold text-amber-900">
+                    Rp {totalEstimate.toLocaleString("id-ID")}
+                  </span>
+                </div>
+
+                <button
+                  onClick={handleSave}
+                  disabled={isPending}
+                  className="flex w-full items-center justify-center gap-3 rounded-2xl bg-stone-900 py-4 text-white transition-all hover:bg-amber-900 active:scale-95 disabled:opacity-50"
+                >
+                  {isPending ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <>
+                      <Calculator size={18} className="text-amber-400" />
+                      <span className="font-bold">Konfirmasi & Simpan</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

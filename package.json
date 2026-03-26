@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "db:push": "drizzle-kit push",
-    "db:seed": "npx tsx db/seed-vendors.ts"
+    "db:seed": "npx tsx db/seed-vendors.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",

@@ -74,7 +74,7 @@ export const vendorProfile = pgTable("vendor_profile", {
   category: text("category").notNull(),
   basePrice: numeric("base_price", { precision: 15, scale: 2 }).default("0"),
   description: text("description"),
-  location: text("location"),
+  location: text("location").default("Buleleng"),
   address: text("address"),
   isVerified: boolean("is_verified").default(false),
   isRecommended: boolean("is_recommended").default(false),
@@ -91,8 +91,25 @@ export const inquiries = pgTable("inquiries", {
   totalEstimate: numeric("total_estimate", { precision: 15, scale: 2 }).default(
     "0"
   ),
+  platformFee: numeric("platform_fee", { precision: 15, scale: 2 }).default(
+    "0"
+  ),
   serviceType: text("service_type").default("self_service"),
-  status: text("status").default("draft"),
+  status: text("status")
+    .$type<
+      | "draft"
+      | "pending_payment" // Khusus Self Service nunggu 50rb
+      | "managed_by_wo" // Masuk antrean WO Bapak
+      | "checking_availability"
+      | "waiting_confirmation"
+      | "negotiating"
+      | "completed"
+      | "cancelled"
+    >()
+    .default("draft"),
+  paymentStatus: text("payment_status")
+    .$type<"unpaid" | "paid">()
+    .default("unpaid"), // Tambahkan ini untuk tracking Platform Fee
   createdAt: timestamp("createdAt").defaultNow(),
 });
 export const vendorPackages = pgTable("vendor_packages", {

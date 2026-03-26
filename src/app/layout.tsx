@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: "Bali Wedding Hub | Rencanakan Pernikahan Impianmu",
   description:
     "Platform kalkulator budget dan direktori vendor wedding terbaik di Bali.",
-  manifest: "/manifest.json", // Penting untuk PWA
+  manifest: "/site.webmanifest.json", // Penting untuk PWA
 };
 
 export default function RootLayout({

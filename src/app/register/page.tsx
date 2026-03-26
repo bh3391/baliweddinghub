@@ -4,24 +4,50 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Loader2, Phone, Eye, EyeOff, Lock } from "lucide-react";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
-  const [role, setRole] = useState("user");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+
+  // State untuk show/hide password
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPasswordError("");
+
+    // Validasi Regex: Minimal 8 karakter, 1 Huruf, 1 Angka
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setPasswordError("Password minimal 8 karakter dan mengandung angka.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setPasswordError("Konfirmasi password tidak cocok.");
+      return;
+    }
+
     setLoading(true);
 
     const { data, error } = await authClient.signUp.email({
       email,
       password,
       name,
-      
+      data: {
+        phone: phoneNumber,
+        role: "user",
+      },
+      callbackURL: "/dashboard/user",
     });
 
     if (error) {
@@ -35,111 +61,155 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#FDFCFB] p-6">
-      <div className="w-full max-w-md">
-        {/* Header Section */}
+      <div className="animate-in fade-in zoom-in w-full max-w-md duration-500">
         <div className="mb-8 text-center">
-          <h1 className="mb-2 font-serif text-4xl text-amber-900">
-            Bergabunglah
+          <h1 className="mb-2 font-serif text-4xl tracking-tight text-amber-900">
+            Mulai Rencanamu
           </h1>
-          <p className="text-sm font-light text-stone-500">
-            Mulai langkah awal menuju hari bahagiamu
+          <p className="text-sm font-light text-stone-500 italic">
+            Wujudkan pernikahan impian di Bali bersama kami
           </p>
         </div>
 
-        {/* Card Section */}
-        <div className="rounded-2xl border border-stone-100 bg-white p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+        <div className="rounded-[2.5rem] border border-stone-100 bg-white p-10 shadow-[0_10px_40px_rgba(0,0,0,0.02)]">
           <form onSubmit={handleRegister} className="space-y-5">
-            {/* Name Input */}
+            {/* Name */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-700">
+              <label className="mb-2 block text-[10px] font-bold tracking-widest text-stone-400 uppercase">
                 Nama Lengkap
               </label>
               <input
                 type="text"
-                placeholder="I Gede Bhakti..."
-                className="w-full rounded-xl border border-stone-200 bg-stone-50 p-3 transition-all outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+                placeholder="I Gede Bhakti"
+                className="w-full rounded-2xl border border-stone-100 bg-stone-50/50 p-4 transition-all outline-none focus:border-amber-200 focus:bg-white focus:ring-4 focus:ring-amber-50"
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
 
-            {/* Email Input */}
+            {/* Phone */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-700">
-                Email
+              <label className="mb-2 block text-[10px] font-bold tracking-widest text-stone-400 uppercase">
+                Nomor WhatsApp
+              </label>
+              <div className="relative">
+                <input
+                  type="tel"
+                  placeholder="081234567..."
+                  className="w-full rounded-2xl border border-stone-100 bg-stone-50/50 p-4 pl-12 transition-all outline-none focus:border-amber-200 focus:bg-white focus:ring-4 focus:ring-amber-50"
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  required
+                />
+                <Phone
+                  className="absolute top-1/2 left-4 -translate-y-1/2 text-stone-300"
+                  size={18}
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="mb-2 block text-[10px] font-bold tracking-widest text-stone-400 uppercase">
+                Alamat Email
               </label>
               <input
                 type="email"
                 placeholder="nama@email.com"
-                className="w-full rounded-xl border border-stone-200 bg-stone-50 p-3 transition-all outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+                className="w-full rounded-2xl border border-stone-100 bg-stone-50/50 p-4 transition-all outline-none focus:border-amber-200 focus:bg-white focus:ring-4 focus:ring-amber-50"
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
 
-            {/* Password Input */}
+            {/* Password Utama */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-700">
+              <label className="mb-2 block text-[10px] font-bold tracking-widest text-stone-400 uppercase">
                 Buat Password
               </label>
-              <input
-                type="password"
-                placeholder="Minimal 8 karakter"
-                className="w-full rounded-xl border border-stone-200 bg-stone-50 p-3 transition-all outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            {/* Role Selection - Lebih Visual */}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-stone-700">
-                Daftar Sebagai
-              </label>
               <div className="relative">
-                <select
-                  className="w-full appearance-none rounded-xl border border-stone-200 bg-stone-50 p-3 text-stone-700 transition-all outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
-                  onChange={(e) => setRole(e.target.value)}
-                  value={role}
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="w-full rounded-2xl border border-stone-100 bg-stone-50/50 p-4 pr-12 pl-12 transition-all outline-none focus:border-amber-200 focus:bg-white focus:ring-4 focus:ring-amber-50"
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Lock
+                  className="absolute top-1/2 left-4 -translate-y-1/2 text-stone-300"
+                  size={18}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-4 -translate-y-1/2 text-stone-400 transition-colors hover:text-amber-800"
                 >
-                  <option value="user">Calon Pengantin</option>
-                  <option value="vendor">Vendor Wedding</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-stone-400">
-                  <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
-                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                  </svg>
-                </div>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Konfirmasi Password */}
+            <div>
+              <label className="mb-2 block text-[10px] font-bold tracking-widest text-stone-400 uppercase">
+                Ulangi Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  className="w-full rounded-2xl border border-stone-100 bg-stone-50/50 p-4 pr-12 pl-12 transition-all outline-none focus:border-amber-200 focus:bg-white focus:ring-4 focus:ring-amber-50"
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <Lock
+                  className="absolute top-1/2 left-4 -translate-y-1/2 text-stone-300"
+                  size={18}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute top-1/2 right-4 -translate-y-1/2 text-stone-400 transition-colors hover:text-amber-800"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {passwordError && (
+              <p className="animate-pulse text-[11px] font-medium text-red-500 italic">
+                * {passwordError}
+              </p>
+            )}
+
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 w-full rounded-xl bg-amber-800 p-4 font-medium text-white transition-all hover:bg-amber-900 hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
+              className="group relative mt-4 w-full overflow-hidden rounded-2xl bg-stone-900 p-4 font-bold text-white shadow-xl shadow-stone-200 transition-all hover:bg-amber-900 active:scale-[0.98] disabled:opacity-50"
             >
-              {loading ? "Sedang Mendaftarkan..." : "Daftar Akun"}
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  "Buat Akun Sekarang"
+                )}
+              </span>
             </button>
           </form>
 
-          <div className="mt-8 border-t border-stone-50 pt-6 text-center">
-            <p className="text-sm text-stone-500">
+          <div className="mt-10 border-t border-stone-50 pt-8 text-center">
+            <p className="text-sm text-stone-400">
               Sudah memiliki akun?{" "}
               <Link
                 href="/login"
-                className="font-semibold text-amber-800 hover:underline"
+                className="font-bold text-amber-800 transition-colors hover:text-amber-900"
               >
                 Masuk di sini
               </Link>
             </p>
           </div>
         </div>
-
-        {/* Footer Note */}
-        <p className="mt-6 text-center text-[10px] tracking-widest text-stone-400 uppercase">
-          Bali Wedding Hub &bull; Est. 2026
-        </p>
       </div>
     </div>
   );

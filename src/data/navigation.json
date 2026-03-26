@@ -5,14 +5,15 @@
       "href": "/dashboard/user",
       "icon": "LayoutDashboard"
     },
-    {
-      "name": "Wedding Planner",
-      "href": "/dashboard/user/plans",
-      "icon": "Heart"
-    },
+
     {
       "name": "Rencana Saya",
       "href": "/dashboard/user/my-plans",
+      "icon": "Heart"
+    },
+    {
+      "name": "Pesanan Saya",
+      "href": "/dashboard/user/inquiry",
       "icon": "Todo2"
     },
 

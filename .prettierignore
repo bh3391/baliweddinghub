@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+dist
+build
+
+# Next.js Build Output
+.next
+out
+
+# Static Assets
+public
+*.ico
+*.png
+*.jpg
+*.svg
+
+# Environment & Logs
+.env*
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database & Migrations
+prisma/migrations
+drizzle/migrations
+*.db
+*.sqlite
+
+# Lock Files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

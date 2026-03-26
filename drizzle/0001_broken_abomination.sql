@@ -1,0 +1,1 @@
+ALTER TABLE "inquiries" ADD COLUMN "platform_fee" numeric(15, 2) DEFAULT '0';
