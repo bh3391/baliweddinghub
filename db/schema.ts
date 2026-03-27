@@ -71,11 +71,13 @@ export const vendorProfile = pgTable("vendor_profile", {
     .references(() => user.id, { onDelete: "cascade" })
     .notNull(),
   businessName: text("business_name").notNull(),
+  slug: text("slug").unique().notNull(),
   category: text("category").notNull(),
   basePrice: numeric("base_price", { precision: 15, scale: 2 }).default("0"),
   description: text("description"),
   location: text("location").default("Buleleng"),
   address: text("address"),
+  images: jsonb("images").$type<{ url: string; alt?: string }[]>().default([]),
   isVerified: boolean("is_verified").default(false),
   isRecommended: boolean("is_recommended").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),

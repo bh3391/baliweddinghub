@@ -1,0 +1,107 @@
+{
+  "hero": {
+    "title": "Wujudkan Pernikahan Impian di Bali",
+    "subtitle": "Temukan vendor terbaik yang sudah dikurasi khusus untuk hari bahagia Anda. Transparan, mudah, dan profesional.",
+    "cta_primary": "Mulai Susun Rencana",
+    "cta_secondary": "Konsultasi WO",
+    "image_url": "https://www.varawedding.com/images/upload/articles/images/73.JPG"
+  },
+  "stats": [
+    { "label": "Vendor Terkurasi", "value": "50+" },
+    { "label": "Pasangan Bahagia", "value": "200+" },
+    { "label": "Lokasi Eksklusif", "value": "15+" }
+  ],
+  "features": [
+    {
+      "title": "Kurasi Manual",
+      "description": "Setiap vendor melalui proses seleksi ketat untuk menjamin kualitas dan profesionalisme."
+    },
+    {
+      "title": "Transparansi Biaya",
+      "description": "Tidak ada biaya tersembunyi. Anda tahu persis apa yang Anda bayar sejak awal."
+    },
+    {
+      "title": "Kendali Penuh",
+      "description": "Pilih vendor sendiri atau biarkan tim ahli kami yang mengelola semuanya untuk Anda."
+    }
+  ],
+
+  "steps": [
+    {
+      "number": "01",
+      "title": "Pilih Vendor Kurasi",
+      "description": "Jelajahi daftar vendor terbaik di Bali yang sudah kami seleksi kualitas dan portofolionya."
+    },
+    {
+      "number": "02",
+      "title": "Bayar Commitment Fee",
+      "description": "Cukup bayar sekali untuk membuka akses komunikasi langsung dengan vendor pilihan Anda."
+    },
+    {
+      "number": "03",
+      "title": "Terhubung via WhatsApp",
+      "description": "Sistem kami otomatis mengirimkan detail Anda ke vendor, dan Anda bisa langsung berdiskusi."
+    }
+  ],
+  "support_note": {
+    "title": "Butuh Bantuan Lebih?",
+    "description": "Anda bisa langsung menghubungi vendor pilihan, atau tim ahli kami siap membantu mengoordinasikan seluruh detail pernikahan Anda dari awal hingga akhir."
+  },
+  "pricing": {
+    "section_title": "Pilih Gaya Perencanaanmu",
+    "section_subtitle": "Satu harga transparan untuk akses tanpa batas, atau biarkan kami yang mengurus semuanya.",
+    "plans": [
+      {
+        "name": "Self-Service",
+        "price": "50.000",
+        "description": "Ideal untuk pasangan yang ingin kendali penuh dan hemat budget.",
+        "features": [
+          "Akses Kontak Vendor Kurasi",
+          "Direct WA ke Vendor",
+          "Panduan Checklist Mandiri",
+          "Tanpa Biaya Admin Tambahan",
+          "Berlaku Selamanya"
+        ],
+        "button_text": "Mulai Perencanaan",
+        "highlight": false
+      },
+      {
+        "name": "Full Managed",
+        "price": "Custom",
+        "description": "Dapatkan tim Wedding Organizer profesional untuk mengurus detail Anda.",
+        "features": [
+          "Seluruh Fitur Self-Service",
+          "Koordinasi Vendor & Venue",
+          "On-the-day Coordination",
+          "Manajemen Budget & Kontrak",
+          "Konsultasi Rutin"
+        ],
+        "button_text": "Hubungi Konsultan",
+        "highlight": true
+      }
+    ]
+  },
+  "navigation": [
+    { "label": "Beranda", "href": "/" },
+    { "label": "Cari Vendor", "href": "/vendors" },
+    { "label": "Tentang Kami", "href": "#about" },
+    { "label": "Kontak", "href": "#contact" }
+  ],
+  "contact": {
+    "email": "hello@baliweddinghub.com",
+    "whatsapp": "+62 812 3456 7890",
+    "address": "Lovina, North Bali"
+  },
+  "vendor_categories": [
+    "Semua",
+    "venue",
+    "dekorasi",
+    "upacara",
+    "makeup",
+    "catering",
+    "snack",
+    "souvenir",
+    "photo",
+    "music"
+  ]
+}

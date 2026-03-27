@@ -47,11 +47,28 @@
     }
   ],
   "admin": [
-    { "name": "Master Data", "href": "/dashboard/admin", "icon": "Settings" },
+    { "name": "Dashboard", "href": "/dashboard/admin", "icon": "Settings" },
     {
       "name": "Verify Vendors",
       "href": "/dashboard/admin/verify",
       "icon": "ClipboardList"
+    },
+    {
+      "name": "Data Vendors",
+      "href": "/dashboard/admin/vendors",
+      "icon": "ClipboardList"
+    },
+    {
+      "name": "Inquiry Masuk",
+      "href": "/dashboard/admin/Inquiry",
+      "icon": "ClipboardList"
+    },
+    {
+      
+      "name": "Data Pelanggan",
+      "href": "/dashboard/admin/verify",
+      "icon": "ClipboardList"
+    
     }
   ]
 }
