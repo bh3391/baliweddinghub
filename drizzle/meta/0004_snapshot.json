@@ -1,6 +1,6 @@
 {
-  "id": "cd96a4bb-0092-4412-a3e9-8bf5e4d5552b",
-  "prevId": "1dce892d-9ad1-4c06-8780-32312b160676",
+  "id": "d88f3d8a-0cef-477a-b978-3d9c42ceddb6",
+  "prevId": "cd96a4bb-0092-4412-a3e9-8bf5e4d5552b",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -141,6 +141,19 @@
           "notNull": false,
           "default": "'[]'::jsonb"
         },
+        "assigned_to": {
+          "name": "assigned_to",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wedding_location": {
+          "name": "wedding_location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Buleleng'"
+        },
         "total_estimate": {
           "name": "total_estimate",
           "type": "numeric(15, 2)",
@@ -154,6 +167,12 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'0'"
+        },
+        "internal_notes": {
+          "name": "internal_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "service_type": {
           "name": "service_type",
@@ -191,6 +210,15 @@
           "tableFrom": "inquiries",
           "tableTo": "user",
           "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "inquiries_assigned_to_user_id_fk": {
+          "name": "inquiries_assigned_to_user_id_fk",
+          "tableFrom": "inquiries",
+          "tableTo": "user",
+          "columnsFrom": ["assigned_to"],
           "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"

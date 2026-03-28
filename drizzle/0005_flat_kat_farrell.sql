@@ -1,0 +1,1 @@
+ALTER TABLE "plan_items" ADD COLUMN "status" text DEFAULT 'on-process';

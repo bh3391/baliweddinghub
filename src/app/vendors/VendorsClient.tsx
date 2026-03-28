@@ -61,8 +61,8 @@ export default function VendorsClient({
 
       {/* Filter & Search Bar (Sama) */}
       <section className="sticky top-[72px] z-30 border-b border-stone-100 bg-white/90 py-4 backdrop-blur-md">
-         {/* ... (isi filter tetap sama) ... */}
-         <div className="container mx-auto flex flex-col items-center justify-between gap-6 px-6 md:flex-row">
+        {/* ... (isi filter tetap sama) ... */}
+        <div className="container mx-auto flex flex-col items-center justify-between gap-6 px-6 md:flex-row">
           <div className="no-scrollbar flex w-full items-center gap-2 overflow-x-auto md:w-auto">
             {settings.vendor_categories.map((cat) => (
               <button
@@ -101,9 +101,10 @@ export default function VendorsClient({
           <AnimatePresence mode="popLayout">
             {filteredVendors.map((vendor) => {
               // Ambil gambar pertama sebagai thumbnail
-              const thumbnail = vendor.images && vendor.images.length > 0 
-                ? vendor.images[0].url 
-                : null;
+              const thumbnail =
+                vendor.images && vendor.images.length > 0
+                  ? vendor.images[0].url
+                  : null;
 
               return (
                 <motion.div
@@ -117,8 +118,7 @@ export default function VendorsClient({
                     href={`/vendors/${vendor.slug}`}
                     className="group block cursor-pointer"
                   >
-                    <div className="relative mb-6 aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-stone-100 shadow-sm border border-stone-100">
-                      
+                    <div className="relative mb-6 aspect-[4/5] overflow-hidden rounded-[2.5rem] border border-stone-100 bg-stone-100 shadow-sm">
                       {/* Tampilkan Gambar Jika Ada */}
                       {thumbnail ? (
                         <Image
@@ -129,7 +129,7 @@ export default function VendorsClient({
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-[10px] text-stone-400 font-bold uppercase tracking-widest italic">
+                        <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold tracking-widest text-stone-400 uppercase italic">
                           No Image Available
                         </div>
                       )}
@@ -139,7 +139,11 @@ export default function VendorsClient({
 
                       {vendor.isRecommended && (
                         <div className="absolute top-6 left-6 z-10 flex items-center gap-1.5 rounded-full bg-amber-900 px-4 py-1.5 text-[8px] font-bold tracking-widest text-white uppercase shadow-lg shadow-amber-900/20">
-                          <Star size={10} className="fill-amber-400 text-amber-400" /> Recommended
+                          <Star
+                            size={10}
+                            className="fill-amber-400 text-amber-400"
+                          />{" "}
+                          Recommended
                         </div>
                       )}
 
@@ -155,15 +159,16 @@ export default function VendorsClient({
 
                     <div className="flex items-center justify-between px-2">
                       <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 text-[10px] tracking-widest text-stone-400 uppercase font-bold">
-                          <MapPin size={12} className="text-amber-800" /> {vendor.location}
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-stone-400 uppercase">
+                          <MapPin size={12} className="text-amber-800" />{" "}
+                          {vendor.location}
                         </div>
                         <p className="font-serif text-xl text-amber-900">
                           IDR {Number(vendor.basePrice).toLocaleString("id-ID")}
                         </p>
                       </div>
-                      
-                      <div className="flex h-14 w-14 items-center justify-center rounded-[1.5rem] border border-stone-100 bg-white text-stone-400 transition-all group-hover:bg-stone-900 group-hover:text-white group-hover:border-stone-900 shadow-sm group-hover:shadow-lg">
+
+                      <div className="flex h-14 w-14 items-center justify-center rounded-[1.5rem] border border-stone-100 bg-white text-stone-400 shadow-sm transition-all group-hover:border-stone-900 group-hover:bg-stone-900 group-hover:text-white group-hover:shadow-lg">
                         <ArrowRight size={20} />
                       </div>
                     </div>
@@ -176,7 +181,7 @@ export default function VendorsClient({
 
         {filteredVendors.length === 0 && (
           <div className="py-24 text-center">
-            <p className="text-stone-400 font-serif text-xl italic">
+            <p className="font-serif text-xl text-stone-400 italic">
               Tidak ada vendor ditemukan di kategori ini.
             </p>
           </div>

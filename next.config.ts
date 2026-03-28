@@ -6,9 +6,9 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        pathname: '**',
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "**",
       },
       // Tambahkan jika nanti Bapak pakai storage lain (misal Supabase atau S3)
       /* {

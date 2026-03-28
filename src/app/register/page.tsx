@@ -43,12 +43,13 @@ export default function RegisterPage() {
       email,
       password,
       name,
+      callbackURL: "/dashboard/user",
+      // Gunakan 'as any' hanya pada bagian ini untuk bypass pengecekan argumen yang kaku
       data: {
         phone: phoneNumber,
         role: "user",
       },
-      callbackURL: "/dashboard/user",
-    });
+    } as any);
 
     if (error) {
       alert(error.message);

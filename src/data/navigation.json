@@ -60,15 +60,13 @@
     },
     {
       "name": "Inquiry Masuk",
-      "href": "/dashboard/admin/Inquiry",
+      "href": "/dashboard/admin/inquiries",
       "icon": "ClipboardList"
     },
     {
-      
       "name": "Data Pelanggan",
       "href": "/dashboard/admin/verify",
       "icon": "ClipboardList"
-    
     }
   ]
 }

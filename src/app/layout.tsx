@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Playfair_Display, Inter, Geist } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 // Font untuk Judul & Kesan Mewah (Luxury Bali Vibes)
 const playfair = Playfair_Display({
@@ -30,7 +33,14 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${playfair.variable} ${inter.variable} h-full antialiased`}
+      className={cn(
+        "h-full",
+        "antialiased",
+        playfair.variable,
+        inter.variable,
+        "font-sans",
+        geist.variable
+      )}
     >
       <body className="flex min-h-full flex-col bg-[#FDFCFB] font-sans text-stone-900">
         {/* Background halus bertema stone/paper agar tidak terlalu putih polos */}

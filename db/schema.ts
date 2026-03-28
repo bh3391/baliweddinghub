@@ -90,12 +90,17 @@ export const inquiries = pgTable("inquiries", {
   planName: text("plan_name"),
   ceremonyDate: text("ceremony_date"),
   selectedVendors: jsonb("selected_vendors").default([]),
+  assignedTo: text("assigned_to").references(() => user.id, {
+    onDelete: "set null",
+  }),
+  weddingLocation: text("wedding_location").default("Buleleng"),
   totalEstimate: numeric("total_estimate", { precision: 15, scale: 2 }).default(
     "0"
   ),
   platformFee: numeric("platform_fee", { precision: 15, scale: 2 }).default(
     "0"
   ),
+  internalNotes: text("internal_notes"),
   serviceType: text("service_type").default("self_service"),
   status: text("status")
     .$type<
@@ -112,6 +117,7 @@ export const inquiries = pgTable("inquiries", {
   paymentStatus: text("payment_status")
     .$type<"unpaid" | "paid">()
     .default("unpaid"), // Tambahkan ini untuk tracking Platform Fee
+
   createdAt: timestamp("createdAt").defaultNow(),
 });
 export const vendorPackages = pgTable("vendor_packages", {
@@ -122,12 +128,16 @@ export const vendorPackages = pgTable("vendor_packages", {
 
   // Tier: 'alit', 'madya', 'utama'
   tier: text("tier").notNull(),
-  packageName: text("package_name").notNull(), // Contoh: "Paket Alit Mawar"
+  packageName: text("package_name").notNull(),
   price: numeric("price", { precision: 15, scale: 2 }).notNull().default("0"),
 
-  // List keunggulan paket (Array of strings)
-  features: jsonb("features").$type<string[]>().default([]),
+  // --- TAMBAHAN BARU ---
+  pax: text("pax"), // Contoh: "50-100 Orang" atau "200 Pax"
+  images: jsonb("images").$type<{ url: string; key: string }[]>().default([]),
+  isPopular: boolean("is_popular").default(false),
+  // ---------------------
 
+  features: jsonb("features").$type<string[]>().default([]),
   description: text("description"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -142,6 +152,7 @@ export const planItems = pgTable("plan_items", {
     .references(() => vendorProfile.id)
     .notNull(),
   packageId: uuid("package_id").references(() => vendorPackages.id),
+  status: text("status").default("on-process"),
   category: text("category").notNull(), // MUA, Photographer, Venue, dll
   priceAtTime: numeric("price_at_time", { precision: 15, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),

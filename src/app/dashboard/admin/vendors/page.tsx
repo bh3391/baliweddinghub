@@ -11,7 +11,8 @@ export default async function AdminVendorPage() {
   // Ambil semua vendor, urutkan dari yang terbaru diupdate
   const allVendors = await db.query.vendorProfile.findMany({
     with: {
-      packages: true, // Ambil data paket sekaligus jika ada relasinya
+      packages: true,
+      user: true, // Ambil data paket sekaligus jika ada relasinya
     },
     orderBy: [desc(vendorProfile.updatedAt)],
   });

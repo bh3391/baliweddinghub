@@ -1,221 +1,247 @@
 "use client";
 
-import { useState } from "react";
-import {
-  MessageCircle,
-  CheckCircle2,
-  Clock,
-  Construction,
-  GlassWater,
-  Heart,
-  Lock,
-  Loader2,
-  UserCheck,
-} from "lucide-react";
+import { useState, useMemo } from "react";
+import { updateInquiry } from "@/actions/inquiries";
+import InquiryDrawerAdmin from "@/components/dashboard/InquiryDrawerAdmin";
 import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Search, Filter } from "lucide-react";
 
-export default function InquiryDetailClient({ inquiry }: { inquiry: any }) {
-  const [loadingId, setLoadingId] = useState<string | null>(null);
+export function InquiryClient({
+  initialData,
+  staff,
+}: {
+  initialData: any[];
+  staff: any[];
+}) {
+  // 1. Simpan ID saja, bukan seluruh objek agar data selalu sinkron dengan initialData
+  const [selectedInquiryId, setSelectedInquiryId] = useState<string | null>(
+    null
+  );
 
-  // Status Config untuk visualisasi progres Managed WO
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case "checking_availability":
-        return {
-          label: "Mengecek Vendor",
-          color: "text-blue-600",
-          bg: "bg-blue-50",
-          icon: Clock,
-        };
-      case "waiting_confirmation":
-        return {
-          label: "Menunggu Konfirmasi",
-          color: "text-amber-600",
-          bg: "bg-amber-50",
-          icon: Construction,
-        };
-      case "negotiating":
-        return {
-          label: "Negosiasi Harga",
-          color: "text-purple-600",
-          bg: "bg-purple-50",
-          icon: GlassWater,
-        };
-      case "completed":
-        return {
-          label: "Selesai & Terkunci",
-          color: "text-emerald-600",
-          bg: "bg-emerald-50",
-          icon: CheckCircle2,
-        };
-      default:
-        return {
-          label: "Proses Antrean WO",
-          color: "text-stone-500",
-          bg: "bg-stone-50",
-          icon: Clock,
-        };
-    }
-  };
+  // 2. State untuk Filter
+  const [searchTerm, setSearchTerm] = useState("");
+  const [serviceFilter, setServiceFilter] = useState<string>("all");
 
-  const config = getStatusConfig(inquiry.status);
-  const isPaid = inquiry.paymentStatus === "paid";
-  const isManaged = inquiry.serviceType === "managed_wo";
+  // 3. Logic Filter & Search (Memoized agar performa kencang)
+  const filteredData = useMemo(() => {
+    return initialData.filter((item) => {
+      const matchesSearch =
+        item.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.planName?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesService =
+        serviceFilter === "all" || item.serviceType === serviceFilter;
 
-  // Fungsi hubungi PIC WO (Bapak)
-  const handleContactPIC = () => {
-    const picPhone = "628123456789"; // GANTI DENGAN NOMOR WA BAPAK
-    const msg = encodeURIComponent(
-      `Halo Bali Wedding Hub, saya ingin bertanya update untuk rencana "${inquiry.planName}".`
-    );
-    window.open(`https://wa.me/${picPhone}?text=${msg}`, "_blank");
-  };
+      return matchesSearch && matchesService;
+    });
+  }, [initialData, searchTerm, serviceFilter]);
 
-  const handleContactVendor = async (
-    vendorId: string,
-    vendorName: string,
-    phone: string
+  // 4. Ambil data inquiry yang sedang dipilih dari initialData terbaru
+  const selectedInquiry = initialData.find(
+    (item) => item.id === selectedInquiryId
+  );
+
+  const handleAssign = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    id: string
   ) => {
-    if (!phone) {
-      toast.error("Nomor WhatsApp vendor tidak tersedia.");
-      return;
-    }
-    setLoadingId(vendorId);
-    try {
-      await new Promise((r) => setTimeout(r, 800));
-      const cleanPhone = phone.replace(/\D/g, "");
-      const finalPhone = cleanPhone.startsWith("0")
-        ? "62" + cleanPhone.slice(1)
-        : cleanPhone;
-      const msg = encodeURIComponent(
-        `Halo ${vendorName}, saya menemukan Anda melalui Bali Wedding Hub...`
-      );
-      window.open(`https://wa.me/${finalPhone}?text=${msg}`, "_blank");
-    } finally {
-      setLoadingId(null);
-    }
+    e.stopPropagation();
+    const res = await updateInquiry(id, { assignedTo: e.target.value });
+    if (res.success) toast.success("PIC has been assigned.");
+  };
+
+  const handleStatusChange = async (val: string, id: string) => {
+    const res = await updateInquiry(id, { status: val as any });
+    if (res.success) toast.success("Inquiry status updated.");
+  };
+
+  const calculateProgress = (planItems: any[]) => {
+    if (!planItems || planItems.length === 0) return 0;
+    const completed = planItems.filter(
+      (item) => item.status === "completed"
+    ).length;
+    return Math.round((completed / planItems.length) * 100);
   };
 
   return (
-    <div className="animate-in fade-in mx-auto max-w-4xl space-y-8 p-4 duration-700 md:p-6">
-      {/* 1. Header Progress (Khusus Managed WO) */}
-      {isManaged && (
-        <div
-          className={`flex flex-col justify-between gap-6 rounded-[2.5rem] border p-8 md:flex-row md:items-center ${config.bg} ${config.color} relative overflow-hidden border-current/10 shadow-sm`}
-        >
-          <div className="relative z-10 flex items-center gap-4">
-            <div className="rounded-2xl bg-white p-3 shadow-sm">
-              <config.icon size={28} />
-            </div>
-            <div>
-              <p className="mb-1 text-[10px] leading-none font-bold tracking-widest uppercase opacity-70">
-                Status Penanganan WO
-              </p>
-              <h2 className="font-serif text-2xl font-bold tracking-tight">
-                {config.label}
-              </h2>
-            </div>
-          </div>
-
-          <button
-            onClick={handleContactPIC}
-            className="relative z-10 flex items-center justify-center gap-2 rounded-2xl border-2 border-current bg-white px-6 py-3 text-sm font-bold transition-all hover:border-stone-900 hover:bg-stone-900 hover:text-white active:scale-95"
-          >
-            <UserCheck size={18} />
-            Hubungi PIC WO
-          </button>
+    <div className="space-y-4">
+      {/* FILTER BOX */}
+      <div className="flex flex-col gap-4 rounded-xl border bg-white p-4 shadow-sm md:flex-row">
+        <div className="relative flex-1">
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Input
+            placeholder="Search customer or plan name..."
+            className="pl-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-      )}
-
-      {/* 2. Vendor List Section */}
-      <div className="space-y-4">
-        <h3 className="px-2 font-serif text-xl text-stone-900">
-          Daftar Vendor Pilihan
-        </h3>
-
-        <div className="grid gap-4">
-          {(inquiry.planItems || []).map((item: any) => {
-            return (
-              <div
-                key={item.id}
-                className="group relative flex flex-col justify-between rounded-[2rem] border border-stone-100 bg-white p-6 shadow-sm transition-all hover:shadow-md md:flex-row md:items-center"
-              >
-                <div className="flex items-center gap-5">
-                  <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-2xl bg-stone-900 text-amber-400">
-                    <Heart size={18} fill="currentColor" />
-                  </div>
-
-                  <div>
-                    <p className="text-[10px] font-bold tracking-widest text-stone-400 uppercase">
-                      {item.category}
-                    </p>
-                    <h4 className="text-lg font-bold text-stone-800">
-                      {item.businessName}
-                    </h4>
-                    {/* Status per vendor jika Managed */}
-                    {isManaged && (
-                      <p className="mt-1 flex items-center gap-1 text-[10px] font-medium text-blue-500 uppercase">
-                        <Clock size={10} /> Sedang dikonfirmasi oleh tim
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-4 md:mt-0">
-                  {isManaged ? (
-                    // TAMPILAN STATUS (Managed WO)
-                    <div className="rounded-full border border-stone-100 bg-stone-50 px-5 py-2 text-[10px] font-bold tracking-wider text-stone-500 uppercase">
-                      Handled by WO
-                    </div>
-                  ) : isPaid ? (
-                    // TOMBOL WA (Self Service - Paid)
-                    <button
-                      disabled={loadingId === item.id}
-                      onClick={() =>
-                        handleContactVendor(
-                          item.id,
-                          item.businessName,
-                          item.phoneNumber
-                        )
-                      }
-                      className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-700"
-                    >
-                      {loadingId === item.id ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <MessageCircle size={16} />
-                      )}
-                      Hubungi Vendor
-                    </button>
-                  ) : (
-                    // TAMPILAN LOCK (Self Service - Unpaid)
-                    <div className="flex items-center gap-2 rounded-xl border border-stone-200 bg-stone-100 px-6 py-3 text-sm font-bold text-stone-400">
-                      <Lock size={14} /> Akses Terkunci
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="flex min-w-[200px] items-center gap-2">
+          <Filter className="h-4 w-4 text-slate-400" />
+          <Select value={serviceFilter} onValueChange={setServiceFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Service Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Service Types</SelectItem>
+              <SelectItem value="full_managed">Full Managed (WO)</SelectItem>
+              <SelectItem value="self_service">Self Service</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* 3. Notes Section (Personal Touch) */}
-      {isManaged && (
-        <div className="rounded-[2.5rem] bg-stone-900 p-8 text-white shadow-2xl">
-          <div className="mb-4 flex items-center gap-2 text-amber-400">
-            <Heart size={20} fill="currentColor" className="animate-pulse" />
-            <span className="text-xs font-bold tracking-widest uppercase">
-              Pesan Personal WO
-            </span>
-          </div>
-          <p className="font-serif text-base leading-relaxed text-stone-300 italic">
-            "Halo Pak Bhakti, kami sedang memastikan semua vendor tersedia
-            sesuai rencana Anda. Klik tombol <b>Hubungi PIC WO</b> di atas jika
-            ada perubahan mendadak."
-          </p>
-        </div>
-      )}
+      {/* TABLE */}
+      <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
+        <table className="min-w-full divide-y divide-slate-200">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-6 py-4 text-left text-[10px] font-bold tracking-wider text-slate-500 uppercase">
+                Plan Name
+              </th>
+              <th className="px-6 py-4 text-left text-[10px] font-bold tracking-wider text-slate-500 uppercase">
+                Customer
+              </th>
+              <th className="px-6 py-4 text-left text-[10px] font-bold tracking-wider text-slate-500 uppercase">
+                Progress
+              </th>
+              <th className="px-6 py-4 text-left text-[10px] font-bold tracking-wider text-slate-500 uppercase">
+                Status
+              </th>
+              <th className="px-6 py-4 text-left text-[10px] font-bold tracking-wider text-slate-500 uppercase">
+                Assign PIC
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {filteredData.length > 0 ? (
+              filteredData.map((item) => {
+                const progressValue = calculateProgress(item.planItems);
+                const totalItems = item.planItems?.length || 0;
+                const completedItems =
+                  item.planItems?.filter((i: any) => i.status === "completed")
+                    .length || 0;
+
+                return (
+                  <tr
+                    key={item.id}
+                    className="group cursor-pointer transition-colors hover:bg-slate-50"
+                    onClick={() => setSelectedInquiryId(item.id)}
+                  >
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-slate-700 group-hover:text-blue-600">
+                        {item.planName || "Untitled Plan"}
+                      </div>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="font-mono text-[10px] text-slate-400 uppercase">
+                          {item.id.slice(0, 8)}
+                        </span>
+                        <span
+                          className={`rounded px-1.5 text-[9px] font-bold uppercase ${
+                            item.serviceType === "full_managed"
+                              ? "bg-purple-100 text-purple-700"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {item.serviceType?.replace("_", " ")}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600">
+                      {item.user?.name || "User"}
+                    </td>
+
+                    <td className="min-w-[140px] px-6 py-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex justify-between text-[10px] font-medium text-slate-500">
+                          <span>{progressValue}% Done</span>
+                          <span>
+                            {completedItems}/{totalItems}
+                          </span>
+                        </div>
+                        <Progress value={progressValue} className="h-1.5" />
+                      </div>
+                    </td>
+
+                    <td
+                      className="px-6 py-4"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Select
+                        value={item.status}
+                        onValueChange={(val) =>
+                          handleStatusChange(val, item.id)
+                        }
+                      >
+                        <SelectTrigger className="h-8 w-[160px] text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending_payment">
+                            Pending Payment
+                          </SelectItem>
+                          <SelectItem value="managed_by_wo">
+                            Managed By WO
+                          </SelectItem>
+                          <SelectItem value="checking_availability">
+                            Checking Availability
+                          </SelectItem>
+                          <SelectItem value="negotiating">
+                            Negotiating
+                          </SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </td>
+
+                    <td
+                      className="px-6 py-4"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <select
+                        value={item.assignedTo || ""}
+                        onChange={(e) => handleAssign(e, item.id)}
+                        className="w-full max-w-[150px] rounded-md border bg-white p-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">No PIC Assigned</option>
+                        {staff.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-6 py-10 text-center text-sm text-slate-400 italic"
+                >
+                  No inquiries found matching your filters.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* MODAL DETAIL (Auto-Sync karena data diambil dari initialData by ID) */}
+      <InquiryDrawerAdmin
+        data={selectedInquiry}
+        isOpen={!!selectedInquiryId}
+        onClose={() => setSelectedInquiryId(null)}
+      />
     </div>
   );
 }
